@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Sep 14 11:15:52 2022
-
-@author: landon, Alvin
+@authors: landon, Alvin, Aidan
 """
 import math
 
@@ -20,6 +19,16 @@ def pubKeyGen(p,q):
           break
    return(e,n,phi)
 
+#Extended Euclid's algorithm
+#Private Key Generation
+def privKeyGen(e, phi):
+    d_old = 0; r_old = phi
+    d_new = 1; r_new = e
+    while r_new > 0:
+        a = r_old // r_new
+        (d_old, d_new) = (d_new, d_old - a * d_new)
+        (r_old, r_new) = (r_new, r_old - a * r_new)
+    return d_old % phi if r_old == 1 else None
 
 
 def main():
