@@ -30,8 +30,14 @@ def privKeyGen(e, phi):
         (r_old, r_new) = (r_new, r_old - a * r_new)
     return d_old % phi if r_old == 1 else None
 
+# Extended GCD Utility
+def extended_gcd(a=1, b=1):
+    if b == 0:
+        return (1, 0, a)
+    (x, y, d) = extended_gcd(b, a%b)
+    return y, x - a//b*y, d
 
-def main():
+if __name__ == "__main__":
     p = 1
     q = 1
     n = 1
