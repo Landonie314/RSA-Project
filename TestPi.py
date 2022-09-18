@@ -37,7 +37,8 @@ def extended_gcd(a=1, b=1):
     (x, y, d) = extended_gcd(b, a%b)
     return y, x - a//b*y, d
 
-if __name__ == "__main__":
+def main():
+
     p = 1
     q = 1
     n = 1
@@ -45,3 +46,66 @@ if __name__ == "__main__":
     phi = 1
     d = 1
     
+while(True):
+    print("\n")
+    print ("RSA keys have been generated.")
+    
+    print("Please select your user type:")
+    print("\t1. A public user")
+    print("\t2. The owner of the keys")
+    print("\t3. Exit program ")
+    
+    choice = input()
+    
+    while(choice == "1"):
+        print("As a public user, what would you like to do?")
+        print("\t1. Send an encrypted message")
+        print("\t2. Authenticate a digital signature")
+        print("\t3. Exit")
+        choice2 = input()
+        
+        if(choice2 == 1):
+            print("Enter a message:")
+            ###
+            print("Message encrypted and sent.")
+            break     
+        
+        elif(choice2 == 2):
+            ###
+            print("There are no signature to authenticate.")
+            break
+        
+        elif(choice2 == 3):
+            choice = 0
+            break
+        
+    while(choice == 2):
+        print("As the owner of the keys, what would you like to do?")
+        print("\t1. Decrypt a received message ")
+        print("\t2. Digitally sign a message")
+        print("\t3. Exit")
+        choice2 = input()
+        
+        if(choice2 == 1):
+            print("The following messages are available:")
+            ###
+            break     
+        
+        elif(choice2 == 2):
+            print("Enter a message:")
+            ###
+            print("Message signed and sent.")
+            break
+        
+        elif(choice2 == 3):
+            choice = 0
+            break
+    
+    if(choice == "3"):
+        print("Bye for now!")
+        break
+        
+
+
+if __name__ == "__main__":
+    main()
