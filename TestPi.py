@@ -5,6 +5,12 @@ Created on Wed Sep 14 11:15:52 2022
 """
 import math
 
+p = 1
+q = 1
+n = 1
+e = 1
+phi = 1
+d = 1
 
 #Euclid's Algorithim
 #Public Key Generation
@@ -36,15 +42,6 @@ def extended_gcd(a=1, b=1):
         return (1, 0, a)
     (x, y, d) = extended_gcd(b, a%b)
     return y, x - a//b*y, d
-
-def main():
-
-    p = 1
-    q = 1
-    n = 1
-    e = 1
-    phi = 1
-    d = 1
     
 while(True):
     print("\n")
@@ -64,48 +61,43 @@ while(True):
         print("\t3. Exit")
         choice2 = input()
         
-        if(choice2 == 1):
+        if(choice2 == "1"):
             print("Enter a message:")
             ###
             print("Message encrypted and sent.")
             break     
         
-        elif(choice2 == 2):
+        elif(choice2 == "2"):
             ###
             print("There are no signature to authenticate.")
             break
         
-        elif(choice2 == 3):
-            choice = 0
+        elif(choice2 == "3"):
+            choice = "0"
             break
         
-    while(choice == 2):
+    while(choice == "2"):
         print("As the owner of the keys, what would you like to do?")
         print("\t1. Decrypt a received message ")
         print("\t2. Digitally sign a message")
         print("\t3. Exit")
         choice2 = input()
         
-        if(choice2 == 1):
+        if(choice2 == "1"):
             print("The following messages are available:")
             ###
             break     
         
-        elif(choice2 == 2):
+        elif(choice2 == "2"):
             print("Enter a message:")
             ###
             print("Message signed and sent.")
             break
         
-        elif(choice2 == 3):
+        elif(choice2 == "3"):
             choice = 0
             break
     
     if(choice == "3"):
         print("Bye for now!")
         break
-        
-
-
-if __name__ == "__main__":
-    main()
