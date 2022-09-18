@@ -44,6 +44,9 @@ def extended_gcd(a=1, b=1):
     return y, x - a//b*y, d
     
 while(True):
+    #wtf is N
+    print("N is:", n)
+    print("E is:", e)
     print("\n")
     print ("RSA keys have been generated.")
     
@@ -64,6 +67,15 @@ while(True):
         if(choice2 == "1"):
             print("Enter a message:")
             ###
+            message = input()
+            #encryption of message letter by letter
+            for k in range(len(message)):
+                print (ord(message[k]))
+                letter = (ord(message[k]))
+                letter = pow(letter, e)
+                letter = math.log(letter,n)
+                print (letter)
+                
             print("Message encrypted and sent.")
             break     
         
