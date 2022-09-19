@@ -43,6 +43,12 @@ def extended_gcd(a=1, b=1):
     (x, y, d) = extended_gcd(b, a%b)
     return y, x - a//b*y, d
 
+# Encrypt per character
+def encrypt(e, n, msg):
+   return [pow(ord(c), e, n) for c in msg]
+
+# Test code for consolidating 4 characters at a time into an integer
+# sum([ord("test"[i]) << 8 * (3-i%4) for i in range(4)])
 
 while(True):
     #wtf is N
@@ -67,16 +73,10 @@ while(True):
         choice2 = input()
         
         if(choice2 == "1"):
-            print("Enter a message:")
-            ###
-            message = input()
+            message = input("Enter a message > ")
             #encryption of message letter by letter
-            for k in range(len(message)):
-                print (ord(message[k]))
-                letter = (ord(message[k]))
-                letter = pow(letter, e)
-                letter = math.log(letter,n)
-                print (letter)
+            msg_c = encrypt(e, n, message)
+            print(msg_c)
                 
             print("Message encrypted and sent.")
             break     
