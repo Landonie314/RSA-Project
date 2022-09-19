@@ -5,12 +5,12 @@ Created on Wed Sep 14 11:15:52 2022
 """
 import math
 
-p = 1
-q = 1
-n = 1
-e = 1
-phi = 1
-d = 1
+p = 588173
+q = 961811
+n = 0
+e = 0
+phi = 0
+d = 0
 
 #Euclid's Algorithim
 #Public Key Generation
@@ -42,9 +42,11 @@ def extended_gcd(a=1, b=1):
         return (1, 0, a)
     (x, y, d) = extended_gcd(b, a%b)
     return y, x - a//b*y, d
-    
+
+
 while(True):
     #wtf is N
+    e,n,phi = pubKeyGen(p,q)
     print("N is:", n)
     print("E is:", e)
     print("\n")
