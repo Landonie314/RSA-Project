@@ -45,10 +45,41 @@ def extended_gcd(a=1, b=1):
 
 # Encrypt per character
 def encrypt(e, n, msg):
-   return [pow(ord(c), e, n) for c in msg]
+   return [pow(c, e, n) for c in chunkify(msg)]
 
 # Test code for consolidating 4 characters at a time into an integer
-# sum([ord("test"[i]) << 8 * (3-i%4) for i in range(4)])
+# sum([ord("test"[i]) << 8 * i for i in range(4)])
+
+# Chunkify
+# Consolidates messages into integer chunks of (chars) characters each,
+# at (bits) bits per character. Default is 32-bit integers representing
+# 4 characters at a time.
+# Meant to prevent the encrypted message becoming a glorified
+# substitution cipher.
+def chunkify(msg, chars = 4, bits = 8):
+    chunks = []
+    for i in range(math.ceil(len(msg) / chars)):
+        chunk = msg[chars*i : chars*(i+1)] # can take out of bounds indices, for some reason. ok!
+        chunk += '\x00' * (chars - len(chunk)) # add null characters if too short
+        chunkbytes = []
+        for j in range(chars):
+            codepoint = ord(chunk[j])
+            if codepoint > 2**bits-1: # too big for given bit count?
+                raise OverflowError(f"Character '{chunk[j]}': Value too large to be represented")
+            chunkbytes.append(codepoint << bits * j) # shift n*j bits to the left
+        chunks.append(sum(chunkbytes))
+    return chunks
+
+# Dechunkify
+# Chunkify in reverse. Chars and bits must be the same.
+def dechunkify(chunks, chars = 4, bits = 8):
+    result = ""
+    mask = 2**bits-1
+    for chunk in chunks:
+        for i in range(chars):
+            result += chr((chunk >> bits * i) & mask)
+    return result.strip("\x00")
+        
 
 while(True):
     #wtf is N
