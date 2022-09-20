@@ -44,8 +44,10 @@ def extended_gcd(a=1, b=1):
     return y, x - a//b*y, d
 
 # Encrypt per character
-def encrypt(e, n, msg):
-   return [pow(c, e, n) for c in chunkify(msg)]
+def encrypt(e, n, msg, chars = 4, bits = 8):
+    if type(msg) == str:
+        msg = chunkify(msg, chars, bits)
+    return [pow(c, e, n) for c in msg]
 
 # Test code for consolidating 4 characters at a time into an integer
 # sum([ord("test"[i]) << 8 * i for i in range(4)])
