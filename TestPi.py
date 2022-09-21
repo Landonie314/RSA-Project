@@ -183,8 +183,8 @@ while(True):
                 print("There are no messages available")
             else:
                 print("The following messages are available:")
-                for x in range(messageCount):
-                    print("{0} Message #{0}: ".format(x + 1)) # is this intentional? - aidan
+                for x in range(len(privateList)):
+                    print("- Message #{0}".format(x)) # is this intentional? - aidan
                     
                 messageChoice = int(input("Enter your choice: "))
                 
