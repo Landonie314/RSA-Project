@@ -60,7 +60,7 @@ def encrypt(e, n, msg, chars = 4, bits = 8):
 def decrypt(n, d, data, chars = None, bits = None):
     result = [pow(i, d, n) for i in data]
     if chars and bits:
-        result = dechunkify(data, chars, bits)
+        result = dechunkify(result, chars, bits)
     return result
 
 # Test code for consolidating 4 characters at a time into an integer
