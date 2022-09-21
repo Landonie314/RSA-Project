@@ -11,6 +11,18 @@ n = 0
 e = 0
 phi = 0
 d = 0
+sig = []
+encrypSig = 0
+decrypSig = 0
+numSig = 0
+sigList = []
+messageCount = 0
+publicMessage = ""
+decrypMessage = ""
+publicList = [""]* 10
+privateList = [""] * 10
+messageChoice = 0
+count = 1
 
 #Euclid's Algorithim
 #Public Key Generation
@@ -83,11 +95,24 @@ def dechunkify(chunks, chars = 4, bits = 8):
     return result.strip("\x00")
         
 
+#Signature Encryption
+def sigEncrypt(c, d, n):
+    s = pow(int(c),d,n)
+    return s
+
+
+#Signature Decryption
+def sigDecrypt(s, e, n):
+    i = pow(s,e,n)
+    return i
+
+
 while(True):
     #wtf is N
     e,n,phi = pubKeyGen(p,q)
-    print("N is:", n)
-    print("E is:", e)
+    d = privKeyGen(e, phi)
+    #print("N is:", n)
+    #print("E is:", e)
     print("\n")
     print ("RSA keys have been generated.")
     
@@ -107,16 +132,35 @@ while(True):
         
         if(choice2 == "1"):
             message = input("Enter a message > ")
+            publicList[messageCount] = message
             #encryption of message letter by letter
             msg_c = encrypt(e, n, message)
+            print("Message encrypted and sent")
+            privateList[messageChoice] = msg_c
             print(msg_c)
                 
             print("Message encrypted and sent.")
             break     
         
         elif(choice2 == "2"):
-            ###
-            print("There are no signature to authenticate.")
+            print("Signature Authentication has been selected.")
+            if len(sig) == 0:
+                print("There are no signature to authenticate")
+                break
+            else:
+                print("The following messages are available: ")
+                for x in sig:
+                    print(count, ". ", x)
+                    count+=1
+                sigChoice = input("Enter your choice: ")
+                decrypSig = sigDecrypt(encrypSig, e, n)
+                print("Decrypted: ", decrypSig, " Encrypted", numSig)
+            
+                if (numSig == decrypSig):
+                    print("Signature verified.")
+                else:
+                    print("Signature is not Valid")
+           
             break
         
         elif(choice2 == "3"):
@@ -131,13 +175,28 @@ while(True):
         choice2 = input()
         
         if(choice2 == "1"):
-            print("The following messages are available:")
-            ###
+            if msg_c is None:
+                print("There are no messages available")
+            else:
+                print("The following messages are available:")
+                for x in range(messageCount):
+                    print(x + 1, "Message #", x + 1, ": ")
+                    
+                messageChoice = int(input("Enter your choice: "))
+                
+                if privateList[messageChoice] != None:
+                    decrypMessage = dechunkify(privateList[messageChoice], d, n)
+                    print("Decrypted message: ", decrypMessage)
+                
             break     
         
         elif(choice2 == "2"):
             print("Enter a message:")
-            ###
+            signature = input
+            sigList.append(signature)
+            for x in signature:
+                numSig += str(ord(x) - 96)
+            encrypSig = sigEncrypt(numSig, d, n)
             print("Message signed and sent.")
             break
         
