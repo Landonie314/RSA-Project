@@ -16,13 +16,8 @@ encrypSig = 0
 decrypSig = 0
 numSig = 0
 sigList = []
-messageCount = 0
-publicMessage = ""
-decrypMessage = ""
-publicList = [""]* 10
-privateList = [""] * 10
-messageChoice = 0
-count = 1
+publicList = []
+privateList = []
 
 #Euclid's Algorithim
 #Public Key Generation
@@ -65,6 +60,7 @@ def encrypt(e, n, msg, chars = 4, bits = 8):
 # sum([ord("test"[i]) << 8 * i for i in range(4)])
 
 # Chunkify
+# **NOT** ENCRYPTION!!!
 # Consolidates messages into integer chunks of (chars) characters each,
 # at (bits) bits per character. Default is 32-bit integers representing
 # 4 characters at a time.
@@ -85,6 +81,7 @@ def chunkify(msg, chars = 4, bits = 8):
     return chunks
 
 # Dechunkify
+# **NOT** DECRYPTION!!!
 # Chunkify in reverse. Chars and bits must be the same.
 def dechunkify(chunks, chars = 4, bits = 8):
     result = ""
@@ -132,14 +129,13 @@ while(True):
         
         if(choice2 == "1"):
             message = input("Enter a message > ")
-            publicList[messageCount] = message
+            publicList.append(message)
             #encryption of message letter by letter
-            msg_c = encrypt(e, n, message)
+            msg_chunks = chunkify(message)
+            msg_c = encrypt(e, n, msg_chunks)
             print("Message encrypted and sent")
-            privateList[messageChoice] = msg_c
+            privateList.append(msg_c)
             print(msg_c)
-                
-            print("Message encrypted and sent.")
             break     
         
         elif(choice2 == "2"):
@@ -149,10 +145,11 @@ while(True):
                 break
             else:
                 print("The following messages are available: ")
+                count = 0
                 for x in sig:
                     print(count, ". ", x)
                     count+=1
-                sigChoice = input("Enter your choice: ")
+                sigChoice = int(input("Enter your choice: ")) #what is this used for?
                 decrypSig = sigDecrypt(encrypSig, e, n)
                 print("Decrypted: ", decrypSig, " Encrypted", numSig)
             
@@ -180,11 +177,16 @@ while(True):
             else:
                 print("The following messages are available:")
                 for x in range(messageCount):
-                    print(x + 1, "Message #", x + 1, ": ")
+                    print("{0} Message #{0}: ".format(x + 1)) # is this intentional? - aidan
                     
                 messageChoice = int(input("Enter your choice: "))
                 
-                if privateList[messageChoice] != None:
+                if messageChoice < len(privateList):
+                    # note: dechunkify is NOT decrypt!!!
+                    # it's meant to allow us to encrypt 4 characters at a time,
+                    # instead of 1. running dechunkify on an encrypted
+                    # message will spit out garbage, BUT i'll leave it here for now,
+                    # until we get a proper decrypt() working.
                     decrypMessage = dechunkify(privateList[messageChoice], d, n)
                     print("Decrypted message: ", decrypMessage)
                 
@@ -195,7 +197,8 @@ while(True):
             signature = input
             sigList.append(signature)
             for x in signature:
-                numSig += str(ord(x) - 96)
+                # this was a string cast - was this ever intentional?
+                numSig += ord(x) - 96
             encrypSig = sigEncrypt(numSig, d, n)
             print("Message signed and sent.")
             break
