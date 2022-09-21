@@ -50,11 +50,18 @@ def extended_gcd(a=1, b=1):
     (x, y, d) = extended_gcd(b, a%b)
     return y, x - a//b*y, d
 
-# Encrypt per character
+# Encrypt per chunk
 def encrypt(e, n, msg, chars = 4, bits = 8):
     if type(msg) == str:
         msg = chunkify(msg, chars, bits)
     return [pow(c, e, n) for c in msg]
+
+# Decrypt per chunk
+def decrypt(n, d, data, chars = None, bits = None):
+    result = [pow(i, d, n) for i in data]
+    if chars and bits:
+        result = dechunkify(data, chars, bits)
+    return result
 
 # Test code for consolidating 4 characters at a time into an integer
 # sum([ord("test"[i]) << 8 * i for i in range(4)])
@@ -120,14 +127,14 @@ while(True):
     
     choice = input()
     
-    while(choice == "1"):
+    while choice == "1":
         print("As a public user, what would you like to do?")
         print("\t1. Send an encrypted message")
         print("\t2. Authenticate a digital signature")
         print("\t3. Exit")
         choice2 = input()
         
-        if(choice2 == "1"):
+        if choice2 == "1":
             message = input("Enter a message > ")
             publicList.append(message)
             #encryption of message letter by letter
@@ -136,9 +143,9 @@ while(True):
             print("Message encrypted and sent")
             privateList.append(msg_c)
             print(msg_c)
-            break     
+            break
         
-        elif(choice2 == "2"):
+        elif choice2 == "2":
             print("Signature Authentication has been selected.")
             if len(sig) == 0:
                 print("There are no signature to authenticate")
@@ -160,18 +167,18 @@ while(True):
            
             break
         
-        elif(choice2 == "3"):
+        elif choice2 == "3":
             choice = "0"
             break
         
-    while(choice == "2"):
+    while choice == "2":
         print("As the owner of the keys, what would you like to do?")
         print("\t1. Decrypt a received message ")
         print("\t2. Digitally sign a message")
         print("\t3. Exit")
         choice2 = input()
         
-        if(choice2 == "1"):
+        if choice2 == "1":
             if msg_c is None:
                 print("There are no messages available")
             else:
@@ -182,17 +189,12 @@ while(True):
                 messageChoice = int(input("Enter your choice: "))
                 
                 if messageChoice < len(privateList):
-                    # note: dechunkify is NOT decrypt!!!
-                    # it's meant to allow us to encrypt 4 characters at a time,
-                    # instead of 1. running dechunkify on an encrypted
-                    # message will spit out garbage, BUT i'll leave it here for now,
-                    # until we get a proper decrypt() working.
-                    decrypMessage = dechunkify(privateList[messageChoice], d, n)
+                    decrypMessage = dechunkify(decrypt(n, d, privateList[messageChoice]))
                     print("Decrypted message: ", decrypMessage)
                 
             break     
         
-        elif(choice2 == "2"):
+        elif choice2 == "2":
             print("Enter a message:")
             signature = input
             sigList.append(signature)
@@ -203,10 +205,10 @@ while(True):
             print("Message signed and sent.")
             break
         
-        elif(choice2 == "3"):
+        elif choice2 == "3":
             choice = 0
             break
     
-    if(choice == "3"):
+    if choice == "3":
         print("Bye for now!")
         break
