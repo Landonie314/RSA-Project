@@ -22,17 +22,54 @@ privateList = []
 
 #Get prime numbers 
 def genPrime():
-    for i in range(500):
-        x = random.randint(500000,5000000)
-        if(x % 2 != 0 and x % 3 != 0 and x % 5 != 0 and x % 7 != 0 and x % 11 != 0 and x % 13 != 0):
-            a = x
-            return a
-        
+    k = 3
+    prime = False
+    
+    while not prime:
+        num = random.randint(100000, 999999)
+        if isPrime(num, k):
+            return num
+    #for i in range(500):
+     #   x = random.randint(500000,5000000)
+      #  if(x % 2 != 0 and x % 3 != 0 and x % 5 != 0 and x % 7 != 0 and x % 11 != 0 and x % 13 != 0):
+       #     a = x
+        #    return a
+
+#Check Primes   
+def isPrime(n, k):
+    
+    if n == 1 or n == 4:
+        return False
+    elif n == 2 or n == 3:
+        return True
+    
+    else:
+        for i in range(k):
+            
+            a = random.randint(2, n-2)
+            if mod(a, n-1, n) != 1:
+                return False
+            
+#Mods potential primes
+def mod(a, n, p):
+    res = 1
+    
+    a = a % p
+    
+    while n > 0:
+        if n % 2:
+            res = (res * a) % p
+            n = n-1
+        else:
+            a = (a ** 2) % p
+            
+            n = n // 2
+    return res % p
 #Function call
-p = genPrime()
-q = genPrime()
-print(p)
-print(q)
+#p = genPrime()
+#q = genPrime()
+#print(p)
+#print(q)
 
 #Euclid's Algorithim
 #Public Key Generation
@@ -128,6 +165,10 @@ def sigDecrypt(s, e, n):
 
 while(True):
     #wtf is N
+    p = genPrime()
+    q = genPrime()
+    print (p)
+    print (q)
     e,n,phi = pubKeyGen(p,q)
     d = privKeyGen(e, phi)
     #print("N is:", n)
