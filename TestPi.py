@@ -21,29 +21,43 @@ publicList = []
 privateList = []
 CANDIDATE_TESTS = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37)
 # added a couple primes past 13 for better actual prime chance
+# may impact performance with the addition of more numbers. can this be fixed?
 
-#Get prime numbers 
-def genPrime():
-    for i in range(500):
-        x = random.randint(500000,5000000)
-        if not False in [x % t != 0 for t in CANDIDATE_TESTS]:
-            # If these conditions are passed the number is *likely* prime
-            a = x
-            return a
-    raise Exception("Failed to find a suitable pseudoprime within 500 tries. Try running the program again.")
-
-#Function call
-#p = genPrime()
-#q = genPrime()
-#print(p)
-#print(q)
+# Prime number generator
+# Extra options included for performance & security tuneup
+def genPrimes(floor=500000,ceil=5000000,cand_num=500,fermat_num=50):
+    sufficient = False
+    while not sufficient:
+        cand = []
+        for i in range(cand_num):
+            x = random.randint(floor,ceil)
+            if not False in [x % t != 0 for t in CANDIDATE_TESTS]:
+                # If these conditions are passed the number may be prime
+                cand.append(x)
+        # Candidates generated, filter them down using Fermat's test
+        cand_f = [i for i in cand if fermat(i, fermat_num)]
+        # If at least 2 pseudoprimes have been generated, the list is sufficient.
+        # If not, do it over again.
+        sufficient = True if len(cand_f) >= 2 else False
+    # Return two non-repeating pseudoprimes from the list at random.
+    p = cand_f.pop(random.randint(0,len(cand_f)-1))
+    q = cand_f.pop(random.randint(0,len(cand_f)-1))
+    return p, q
+        
 
 # Fermat's Test
+# Pseudoprime candidate verification.
 def fermat(n, tests=50):
     a = 0
     for foo in range(tests):
+        # Select a in the lower half of n such that a and n are
+        # relatively prime. This will work immediately if n is
+        # truly prime, but it doesnt't hurt to make sure.
         while math.gcd(a, n) != 1:
             a = random.randint(2, n//2)
+        # Apply Fermat's Little Theorem.
+        # If any number a between 0 and n does not satisfy
+        # a^(n-1) % n = 1, then the number is definitely not prime.
         if pow(a, n-1, n) != 1:
             return False
     return True
@@ -73,6 +87,7 @@ def privKeyGen(e, phi):
     return d_old % phi if r_old == 1 else None
 
 # Extended GCD Utility
+# Where does this fit?
 def extended_gcd(a=1, b=1):
     if b == 0:
         return (1, 0, a)
@@ -97,11 +112,10 @@ def decrypt(n, d, data, chars = None, bits = None):
 
 # Chunkify
 # **NOT** ENCRYPTION!!!
-# Consolidates messages into integer chunks of (chars) characters each,
-# at (bits) bits per character. Default is 32-bit integers representing
-# 4 characters at a time.
-# Meant to prevent the encrypted message becoming a glorified
-# substitution cipher.
+# Turns sets of (chars) characters at a time into single integers
+# with the same binary representation in memory.
+# Default is 32-bit integers. (8 bits per character, 4 characters per chunk)
+# Meant to deter the use of frequency analysis on per-character encryption.
 def chunkify(msg, chars = 4, bits = 8):
     chunks = []
     for i in range(math.ceil(len(msg) / chars)):
@@ -140,18 +154,15 @@ def sigDecrypt(s, e, n):
     return i
 
 
-while(True):
-    #wtf is N
-    p = genPrime()
-    q = genPrime()
-    print (p)
-    print (q)
-    e,n,phi = pubKeyGen(p,q)
-    d = privKeyGen(e, phi)
-    #print("N is:", n)
-    #print("E is:", e)
-    print("\n")
-    print ("RSA keys have been generated.")
+
+#wtf is N
+(p, q) = genPrimes()
+print (p, q)
+e,n,phi = pubKeyGen(p,q)
+d = privKeyGen(e, phi)
+print ("RSA keys have been generated.")
+
+while 1:
     
     print("Please select your user type:")
     print("\t1. A public user")
@@ -223,7 +234,7 @@ while(True):
                 
                 if messageChoice < len(privateList):
                     decrypMessage = dechunkify(decrypt(n, d, privateList[messageChoice]))
-                    print("Decrypted message: ", decrypMessage)
+                    print("Decrypted message:", decrypMessage)
                 
             break     
         
