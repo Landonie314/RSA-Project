@@ -6,6 +6,8 @@ Created on Wed Sep 14 11:15:52 2022
 import math
 import random
 
+#p = 588173
+#q = 961811
 n = 0
 e = 0
 phi = 0
@@ -21,7 +23,7 @@ privateList = []
 #Get prime numbers 
 def genPrime():
     for i in range(500):
-        x = random.randint(1000000,10000000)
+        x = random.randint(500000,5000000)
         if(x % 2 != 0 and x % 3 != 0 and x % 5 != 0 and x % 7 != 0 and x % 11 != 0):
             a = x
             return a
@@ -29,6 +31,8 @@ def genPrime():
 #Function call
 p = genPrime()
 q = genPrime()
+print(p)
+print(q)
 
 #Euclid's Algorithim
 #Public Key Generation
