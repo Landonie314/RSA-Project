@@ -239,13 +239,13 @@ while 1:
             break     
         
         elif choice2 == "2":
-            print("Enter a message:")
-            signature = input
+            signature = input("Enter a message:")
             sigList.append(signature)
             for x in signature:
                 # this was a string cast - was this ever intentional?
                 numSig += ord(x) - 96
             encrypSig = sigEncrypt(numSig, d, n)
+            sig.append(encrypSig)
             print("Message signed and sent.")
             break
         
