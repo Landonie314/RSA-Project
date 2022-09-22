@@ -171,7 +171,7 @@ while(True):
                 for x in sig:
                     print(count, ". ", x)
                     count+=1
-                sigChoice = int(input("Enter your choice: ")) #what is this used for?
+                sigChoice = int(input("Enter your choice: ")) #what is this used for? - i wanted to do a way to choose what message to decrypt but never finished
                 decrypSig = sigDecrypt(encrypSig, e, n)
                 print("Decrypted: ", decrypSig, " Encrypted", numSig)
             
@@ -200,7 +200,7 @@ while(True):
                 print("The following messages are available:")
                 for x in range(len(privateList)):
                     print("- Message #{0}".format(x)) # is this intentional? - aidan
-                    
+                    #print(x + 1, "Message #", x + 1, ": ") should we use this one? - Alvin
                 messageChoice = int(input("Enter your choice: "))
                 
                 if messageChoice < len(privateList):
