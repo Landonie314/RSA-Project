@@ -24,7 +24,7 @@ privateList = []
 def genPrime():
     for i in range(500):
         x = random.randint(500000,5000000)
-        if(x % 2 != 0 and x % 3 != 0 and x % 5 != 0 and x % 7 != 0 and x % 11 != 0):
+        if(x % 2 != 0 and x % 3 != 0 and x % 5 != 0 and x % 7 != 0 and x % 11 != 0 and x % 13 != 0):
             a = x
             return a
         
