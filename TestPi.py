@@ -6,16 +6,7 @@ Created on Wed Sep 14 11:15:52 2022
 import math
 import random
 
-#p = 588173
-#q = 961811
-n = 0
-e = 0
-phi = 0
-d = 0
-sig = []
-encrypSig = 0
-decrypSig = 0
-numSig = 0
+
 sigList = []
 publicList = []
 privateList = []
@@ -51,7 +42,7 @@ def fermat(n, tests=50):
     a = 0
     for foo in range(tests):
         # Select a in the lower half of n such that a and n are
-        # relatively prime. This will work immediately if n is
+        # relatively prime. This should work immediately if n is
         # truly prime, but it doesnt't hurt to make sure.
         while math.gcd(a, n) != 1:
             a = random.randint(2, n//2)
@@ -62,32 +53,26 @@ def fermat(n, tests=50):
             return False
     return True
 
-#Euclid's Algorithim
-#Public Key Generation
-def pubKeyGen(p,q):
-   n = p*q
-   e = 0
-   phi = (p-1)*(q-1)
+# (Extended) Euclid's Algorithm
+# Keypair generation (publickey, privatekey)
+# Publickey: (e, n)   Privatekey: (d, n)
+def genKeypair(p, q):
+    n = p*q
+    e = 0
+    phi = (p-1)*(q-1)
 
-   for x in range(phi):
-       if(math.gcd(x,phi) == 1 and x > 1):
-          e = x
-          break
-   return(e,n,phi)
-
-#Extended Euclid's algorithm
-#Private Key Generation
-def privKeyGen(e, phi):
-    d_old = 0; r_old = phi
-    d_new = 1; r_new = e
-    while r_new > 0:
-        a = r_old // r_new
-        (d_old, d_new) = (d_new, d_old - a * d_new)
-        (r_old, r_new) = (r_new, r_old - a * r_new)
-    return d_old % phi if r_old == 1 else None
+    # should not take long; e is usually a single-digit number
+    for x in range(phi):
+        if(math.gcd(x,phi) == 1 and x > 1):
+            e = x
+            break
+    
+    # generate d using extended euclid gcd
+    d = extended_gcd(e, phi)[0] % phi
+    # pubkey, privkey
+    return ((e, n), (d, n))
 
 # Extended GCD Utility
-# Where does this fit?
 def extended_gcd(a=1, b=1):
     if b == 0:
         return (1, 0, a)
@@ -95,14 +80,14 @@ def extended_gcd(a=1, b=1):
     return y, x - a//b*y, d
 
 # Encrypt per chunk
-def encrypt(e, n, msg, chars = 4, bits = 8):
+def encrypt(publickey, msg, chars = 4, bits = 8):
     if type(msg) == str:
         msg = chunkify(msg, chars, bits)
-    return [pow(c, e, n) for c in msg]
+    return [pow(c, publickey[0], publickey[1]) for c in msg]
 
 # Decrypt per chunk
-def decrypt(n, d, data, chars = None, bits = None):
-    result = [pow(i, d, n) for i in data]
+def decrypt(privatekey, data, chars = None, bits = None):
+    result = [pow(i, privatekey[0], privatekey[1]) for i in data]
     if chars and bits:
         result = dechunkify(result, chars, bits)
     return result
@@ -143,14 +128,14 @@ def dechunkify(chunks, chars = 4, bits = 8):
         
 
 #Signature Encryption
-def sigEncrypt(c, d, n):
-    s = pow(int(c),d,n)
+def sigEncrypt(c, privKey):
+    s = pow(int(c),privKey[0],privKey[1])
     return s
 
 
 #Signature Decryption
-def sigDecrypt(s, e, n):
-    i = pow(s,e,n)
+def sigDecrypt(s, pubKey):
+    i = pow(s,pubKey[0],pubKey[1])
     return i
 
 
@@ -158,8 +143,7 @@ def sigDecrypt(s, e, n):
 #wtf is N
 (p, q) = genPrimes()
 print (p, q)
-e,n,phi = pubKeyGen(p,q)
-d = privKeyGen(e, phi)
+pubKey, privKey = genKeypair(p, q)
 print ("RSA keys have been generated.")
 
 while 1:
@@ -183,7 +167,7 @@ while 1:
             publicList.append(message)
             #encryption of message letter by letter
             msg_chunks = chunkify(message)
-            msg_c = encrypt(e, n, msg_chunks)
+            msg_c = encrypt(pubKey, msg_chunks)
             print("Message encrypted and sent")
             privateList.append(msg_c)
             print(msg_c)
@@ -191,20 +175,21 @@ while 1:
         
         elif choice2 == "2":
             print("Signature Authentication has been selected.")
-            if len(sig) == 0:
-                print("There are no signature to authenticate")
+            if len(sigList) == 0:
+                print("There are no signatures to authenticate")
                 break
             else:
                 print("The following messages are available: ")
                 count = 0
-                for x in sig:
+                for x in sigList:
                     print(count, ". ", x)
                     count+=1
-                sigChoice = int(input("Enter your choice: ")) #what is this used for? - i wanted to do a way to choose what message to decrypt but never finished
-                decrypSig = sigDecrypt(encrypSig, e, n)
-                print("Decrypted: ", decrypSig, " Encrypted", numSig)
+                sigChoice = int(input("Enter your choice: "))
+                sig = sigList[sigChoice]
+                decrypSig = sigDecrypt(sig[0], pubKey)
+                print("Decrypted:", decrypSig, "Original:", sig[1])
             
-                if (numSig == decrypSig):
+                if (sig[1] == decrypSig):
                     print("Signature verified.")
                 else:
                     print("Signature is not Valid")
@@ -233,19 +218,18 @@ while 1:
                 messageChoice = int(input("Enter your choice: "))
                 
                 if messageChoice < len(privateList):
-                    decrypMessage = dechunkify(decrypt(n, d, privateList[messageChoice]))
+                    decrypMessage = dechunkify(decrypt(privKey, privateList[messageChoice]))
                     print("Decrypted message:", decrypMessage)
                 
             break     
         
         elif choice2 == "2":
             signature = input("Enter a message:")
-            sigList.append(signature)
+            numSig = 0
             for x in signature:
                 # this was a string cast - was this ever intentional?
-                numSig += ord(x) - 96
-            encrypSig = sigEncrypt(numSig, d, n)
-            sig.append(encrypSig)
+                numSig += ord(x)
+            sigList.append((sigEncrypt(numSig, privKey), numSig))
             print("Message signed and sent.")
             break
         
