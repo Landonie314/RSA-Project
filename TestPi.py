@@ -6,13 +6,10 @@ Created on Wed Sep 14 11:15:52 2022
 import math
 import random
 
-
-sigList = []
-publicList = []
-privateList = []
 CANDIDATE_TESTS = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37)
 # added a couple primes past 13 for better actual prime chance
 # may impact performance with the addition of more numbers. can this be fixed?
+
 
 # Prime number generator
 # Extra options included for performance & security tuneup
@@ -53,6 +50,7 @@ def fermat(n, tests=50):
             return False
     return True
 
+
 # (Extended) Euclid's Algorithm
 # Keypair generation (publickey, privatekey)
 # Publickey: (e, n)   Privatekey: (d, n)
@@ -72,6 +70,7 @@ def genKeypair(p, q):
     # pubkey, privkey
     return ((e, n), (d, n))
 
+
 # Extended GCD Utility
 def extended_gcd(a=1, b=1):
     if b == 0:
@@ -79,11 +78,13 @@ def extended_gcd(a=1, b=1):
     (x, y, d) = extended_gcd(b, a%b)
     return y, x - a//b*y, d
 
+
 # Encrypt per chunk
 def encrypt(publickey, msg, chars = 4, bits = 8):
     if type(msg) == str:
         msg = chunkify(msg, chars, bits)
     return [pow(c, publickey[0], publickey[1]) for c in msg]
+
 
 # Decrypt per chunk
 def decrypt(privatekey, data, chars = None, bits = None):
@@ -92,8 +93,10 @@ def decrypt(privatekey, data, chars = None, bits = None):
         result = dechunkify(result, chars, bits)
     return result
 
+
 # Test code for consolidating 4 characters at a time into an integer
 # sum([ord("test"[i]) << 8 * i for i in range(4)])
+
 
 # Chunkify
 # **NOT** ENCRYPTION!!!
@@ -114,6 +117,7 @@ def chunkify(msg, chars = 4, bits = 8):
             chunkbytes.append(codepoint << bits * j) # shift n*j bits to the left
         chunks.append(sum(chunkbytes))
     return chunks
+
 
 # Dechunkify
 # **NOT** DECRYPTION!!!
@@ -140,103 +144,108 @@ def sigDecrypt(s, pubKey):
 
 
 
-#wtf is N
-(p, q) = genPrimes()
-print (p, q)
-pubKey, privKey = genKeypair(p, q)
-print ("RSA keys have been generated.")
+if __name__ == "__main__":
 
-while 1:
-    
-    print("Please select your user type:")
-    print("\t1. A public user")
-    print("\t2. The owner of the keys")
-    print("\t3. Exit program ")
-    
-    choice = input()
-    
-    while choice == "1":
-        print("As a public user, what would you like to do?")
-        print("\t1. Send an encrypted message")
-        print("\t2. Authenticate a digital signature")
-        print("\t3. Exit")
-        choice2 = input()
+    sigList = []
+    publicList = []
+    privateList = []
+    #wtf is N
+    (p, q) = genPrimes()
+    print (p, q)
+    pubKey, privKey = genKeypair(p, q)
+    print ("RSA keys have been generated.")
+
+    while 1:
         
-        if choice2 == "1":
-            message = input("Enter a message > ")
-            publicList.append(message)
-            #encryption of message letter by letter
-            msg_chunks = chunkify(message)
-            msg_c = encrypt(pubKey, msg_chunks)
-            print("Message encrypted and sent")
-            privateList.append(msg_c)
-            print(msg_c)
-            break
+        print("Please select your user type:")
+        print("\t1. A public user")
+        print("\t2. The owner of the keys")
+        print("\t3. Exit program ")
         
-        elif choice2 == "2":
-            print("Signature Authentication has been selected.")
-            if len(sigList) == 0:
-                print("There are no signatures to authenticate")
-                break
-            else:
-                print("The following messages are available: ")
-                count = 0
-                for x in sigList:
-                    print(count, ". ", x)
-                    count+=1
-                sigChoice = int(input("Enter your choice: "))
-                sig = sigList[sigChoice]
-                decrypSig = sigDecrypt(sig[0], pubKey)
-                print("Decrypted:", decrypSig, "Original:", sig[1])
+        choice = input()
+        
+        while choice == "1":
+            print("As a public user, what would you like to do?")
+            print("\t1. Send an encrypted message")
+            print("\t2. Authenticate a digital signature")
+            print("\t3. Exit")
+            choice2 = input()
             
-                if (sig[1] == decrypSig):
-                    print("Signature verified.")
+            if choice2 == "1":
+                message = input("Enter a message > ")
+                publicList.append(message)
+                #encryption of message letter by letter
+                msg_chunks = chunkify(message)
+                msg_c = encrypt(pubKey, msg_chunks)
+                print("Message encrypted and sent")
+                privateList.append(msg_c)
+                print(msg_c)
+                break
+            
+            elif choice2 == "2":
+                print("Signature Authentication has been selected.")
+                if len(sigList) == 0:
+                    print("There are no signatures to authenticate")
+                    break
                 else:
-                    print("Signature is not Valid")
-           
-            break
-        
-        elif choice2 == "3":
-            choice = "0"
-            break
-        
-    while choice == "2":
-        print("As the owner of the keys, what would you like to do?")
-        print("\t1. Decrypt a received message ")
-        print("\t2. Digitally sign a message")
-        print("\t3. Exit")
-        choice2 = input()
-        
-        if choice2 == "1":
-            if msg_c is None:
-                print("There are no messages available")
-            else:
-                print("The following messages are available:")
-                for x in range(len(privateList)):
-                    print("- Message #{0}".format(x)) # is this intentional? - aidan
-                    #print(x + 1, "Message #", x + 1, ": ") should we use this one? - Alvin
-                messageChoice = int(input("Enter your choice: "))
+                    print("The following messages are available: ")
+                    count = 0
+                    for x in sigList:
+                        print(count, ". ", x)
+                        count+=1
+                    sigChoice = int(input("Enter your choice: "))
+                    sig = sigList[sigChoice]
+                    decrypSig = sigDecrypt(sig[0], pubKey)
+                    print("Decrypted:", decrypSig, "Original:", sig[1])
                 
-                if messageChoice < len(privateList):
-                    decrypMessage = dechunkify(decrypt(privKey, privateList[messageChoice]))
-                    print("Decrypted message:", decrypMessage)
-                
-            break     
+                    if (sig[1] == decrypSig):
+                        print("Signature verified.")
+                    else:
+                        print("Signature is not Valid")
+               
+                break
+            
+            elif choice2 == "3":
+                choice = "0"
+                break
+            
+        while choice == "2":
+            print("As the owner of the keys, what would you like to do?")
+            print("\t1. Decrypt a received message ")
+            print("\t2. Digitally sign a message")
+            print("\t3. Exit")
+            choice2 = input()
+            
+            if choice2 == "1":
+                if msg_c is None:
+                    print("There are no messages available")
+                else:
+                    print("The following messages are available:")
+                    for x in range(len(privateList)):
+                        print("- Message #{0}".format(x)) # is this intentional? - aidan
+                        #print(x + 1, "Message #", x + 1, ": ") should we use this one? - Alvin
+                    messageChoice = int(input("Enter your choice: "))
+                    
+                    if messageChoice < len(privateList):
+                        decrypMessage = dechunkify(decrypt(privKey, privateList[messageChoice]))
+                        print("Decrypted message:", decrypMessage)
+                    
+                break     
+            
+            elif choice2 == "2":
+                signature = input("Enter a message:")
+                numSig = 0
+                for x in signature:
+                    # this was a string cast - was this ever intentional?
+                    numSig += ord(x)
+                sigList.append((sigEncrypt(numSig, privKey), numSig))
+                print("Message signed and sent.")
+                break
+            
+            elif choice2 == "3":
+                choice = 0
+                break
         
-        elif choice2 == "2":
-            signature = input("Enter a message:")
-            numSig = 0
-            for x in signature:
-                # this was a string cast - was this ever intentional?
-                numSig += ord(x)
-            sigList.append((sigEncrypt(numSig, privKey), numSig))
-            print("Message signed and sent.")
+        if choice == "3":
+            print("Bye for now!")
             break
-        
-        elif choice2 == "3":
-            choice = 0
-            break
-    
-    if choice == "3":
-        print("Bye for now!")
-        break
